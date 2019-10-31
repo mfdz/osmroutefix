@@ -1,0 +1,3 @@
+*.osm.pbf
+target/
+*.osm-gh/

@@ -51,6 +51,12 @@
                     </span>
         </div>
         <form id="locationform">
+            <label>Route Type:
+                <select id="osmRouteType">
+                    <option>detour</option>
+                    <option>bus</option>
+                </select>
+            </label>
             <div class="time_input">
                 <input id="input_date_0" class="flatpickr input_date" type="text" placeholder="Select Date &amp; Time"/>
             </div>
@@ -61,7 +67,17 @@
             <input id="searchButton" type="submit" value="Search">
         </form>
         <div id="export-link" class="left"><a href="/maps"><img src='img/link.png'></a></div>
+        <div id="osmRouteExportButton"><a href=""><img alt="osmRoute" src='img/osm.png'></a></div>
         <div id="gpxExportButton"><a href=""><img alt="gpx" src='img/gpx.png'></a></div>
+
+        <form id="osmrouteform">
+            <label>Route ID:
+                <input id="osmRouteId" type="text">
+            </label>
+            <div class="clear"></div>
+            <input id="loadButton" type="submit" value="Load existing OSM Route">
+        </form>
+        <div id="osmRouteFixButton"><a href=""><img alt="osmRoute" src='img/osm.png'></a></div>
         <div id="hosting">Powered by <a href='https://www.graphhopper.com/products/'>GraphHopper API</a></div>
     </div>
     <div class="clear"></div>
@@ -72,14 +88,9 @@
 
     <div id="footer">
         <div id="link_line">
-            <form id="donate_form" action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
-                <input type="hidden" name="cmd" value="_s-xclick"/>
-                <input type="hidden" name="hosted_button_id" value="P9JQECJKH46JN"/>
-                <input id="donate_form_button" class="footer-link" type="submit" name="submit" value="Donate"/>
-            </form>
-            <a class="footer-link" href='https://graphhopper.com/#contact'>Imprint</a>
-            <a class="footer-link" href='https://graphhopper.com/terms.html'>Terms</a>
-            <a class="footer-link" href='https://graphhopper.com/privacy.html'>Privacy</a>
+            <a class="footer-link" href='https://www.mfdz.de/impressum'>Impressum</a>
+            <!--a class="footer-link" href='https://graphhopper.com/terms.html'>Nutzungsbedingungen</a>-->
+            <a class="footer-link" href='https://www.mfdz.de/datenschutz'>Datenschutz</a>
         </div>
     </div>
 
@@ -110,25 +121,5 @@
 </div>
 <div id="map">
 </div>
-
-<!-- Matomo -->
-<script type="text/javascript">
-        PIWIK = false;
-        if (PIWIK) {
-          var _paq = window._paq || [];
-          /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
-          _paq.push(['trackPageView']);
-          _paq.push(['enableLinkTracking']);
-          (function() {
-            var u="//matomo.graphhopper.com/";
-            _paq.push(['setTrackerUrl', u+'matomo.php']);
-            _paq.push(['setSiteId', '1']);
-            var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
-            g.type='text/javascript'; g.async=true; g.defer=true; g.src=u+'matomo.js'; s.parentNode.insertBefore(g,s);
-          })();
-        }
-</script>
-<noscript><p><img src="https://matomo.graphhopper.com/matomo.php?idsite=1&amp;rec=1" style="border:0;" alt=""/></p></noscript>
-<!-- End Matomo Code -->
 </body>
 </html>

@@ -15,10 +15,11 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package com.graphhopper.http;
+package de.mfdz.osmrf.http;
 
-import com.graphhopper.gtfs.dropwizard.RealtimeBundle;
-import com.graphhopper.http.cli.ImportCommand;
+import com.graphhopper.http.*;
+import de.mfdz.osmrf.graphhopper.RouteFixBundle;
+import de.mfdz.osmrf.http.cli.ImportCommand;
 import com.graphhopper.http.resources.RootResource;
 import io.dropwizard.Application;
 import io.dropwizard.bundles.assets.ConfiguredAssetsBundle;
@@ -28,16 +29,15 @@ import io.dropwizard.setup.Environment;
 import javax.servlet.DispatcherType;
 import java.util.EnumSet;
 
-public final class GraphHopperApplication extends Application<GraphHopperServerConfiguration> {
+public final class RouteFixApplication extends Application<GraphHopperServerConfiguration> {
 
     public static void main(String[] args) throws Exception {
-        new GraphHopperApplication().run(args);
+        new RouteFixApplication().run(args);
     }
 
     @Override
     public void initialize(Bootstrap<GraphHopperServerConfiguration> bootstrap) {
-        bootstrap.addBundle(new GraphHopperBundle());
-        bootstrap.addBundle(new RealtimeBundle());
+        bootstrap.addBundle(new RouteFixBundle());
         bootstrap.addBundle(new ConfiguredAssetsBundle("/assets/", "/maps/", "index.html"));
         bootstrap.addCommand(new ImportCommand());
     }

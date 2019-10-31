@@ -39,6 +39,7 @@ var mapLayer = require('./map.js');
 var nominatim = require('./nominatim.js');
 var routeManipulation = require('./routeManipulation.js');
 var gpxExport = require('./gpxexport.js');
+var osmRouteExport = require('./osmRouteExport.js');
 var messages = require('./messages.js');
 var translate = require('./translate.js');
 
@@ -70,6 +71,7 @@ $(document).ready(function (e) {
     jQuery.support.cors = true;
 
     gpxExport.addGpxExport(ghRequest);
+    osmRouteExport.addOsmRouteExport(ghRequest);
 
     if (isProduction())
         $('#hosting').show();
@@ -93,6 +95,12 @@ $(document).ready(function (e) {
         mySubmit();
     });
 
+    $('#osmrouteform').submit(function (e) {
+        // no page reload
+        e.preventDefault();
+        routeLatLng(ghRequest, true, $('#osmRouteId').val());
+    });
+
     var urlParams = urlTools.parseUrlWithHisto();
     $.when(ghRequest.fetchTranslationMap(urlParams.locale), ghRequest.getInfo())
             .then(function (arg1, arg2) {
@@ -111,6 +119,7 @@ $(document).ready(function (e) {
                 bounds.maxLon = tmp[2];
                 bounds.maxLat = tmp[3];
                 nominatim.setBounds(bounds);
+
                 var vehiclesDiv = $("#vehicles");
 
                 function createButton(vehicle, hide) {
@@ -496,7 +505,7 @@ function flagAll() {
     }
 }
 
-function routeLatLng(request, doQuery) {
+function routeLatLng(request, doQuery, routeId) {
     var i;
 
     // do_zoom should not show up in the URL but in the request object to avoid zooming for history change
@@ -532,7 +541,7 @@ function routeLatLng(request, doQuery) {
     $("#vehicles button").removeClass("selectvehicle");
     $("button#" + request.getVehicle().toLowerCase()).addClass("selectvehicle");
 
-    var urlForAPI = request.createURL();
+    var urlForAPI = request.createURL(routeId);
     routeResultsDiv.html('<img src="img/indicator.gif"/> Search Route ...');
     request.doRequest(urlForAPI, function (json) {
         routeResultsDiv.html("");

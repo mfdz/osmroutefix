@@ -190,6 +190,12 @@ body {
 #gpxExportButton img {
     padding-left: 6px;
 }
+#osmRouteExportButton {
+    margin-top: -3px;
+}
+#osmRouteExportButton img {
+    padding-left: 6px;
+}
 #searchButton {
     float: right;
     margin-bottom: 5px;

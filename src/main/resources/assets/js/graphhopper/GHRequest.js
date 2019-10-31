@@ -38,7 +38,7 @@ var GHRequest = function (host, api_key) {
     this.useMiles = false;
     this.dataType = "json";
     this.api_params = {"locale": "en", "vehicle": "car", "weighting": "fastest", "elevation": false,
-        "key": api_key, "pt": {}};
+        "key": api_key, "pt": {}, "routeType": "detour"};
 
     // register events
     this.route.addListener('route.add', function (evt) {
@@ -127,6 +127,11 @@ GHRequest.prototype.getEarliestDepartureTime = function () {
     return undefined;
 };
 
+// TODO call initRouteType when changes on DropDown
+GHRequest.prototype.initRouteType = function (routeType) {
+    this.api_params.routeType = routeType;
+}
+
 GHRequest.prototype.initVehicle = function (vehicle) {
     this.api_params.vehicle = vehicle;
     var featureSet = this.features[vehicle];
@@ -164,12 +169,25 @@ GHRequest.prototype.createGeocodeURL = function (host, prevIndex) {
     return path;
 };
 
-GHRequest.prototype.createURL = function () {
-    return this.createPath(this.host + "/route?" + this.createPointParams(false) + "&type=" + this.dataType);
+// if routeId is given, request by routeId, else by points
+GHRequest.prototype.createURL = function (routeId) {
+    if (routeId) {
+        return this.createPath(this.host + "/osmRouteRelation?routeId=" + routeId + "&type=" + this.dataType);
+    } else {
+        return this.createPath(this.host + "/osmRouteRelation?" + this.createPointParams(false) + "&type=" + this.dataType);
+    }
+};
+
+GHRequest.prototype.createOsmRouteURL = function () {
+    return this.createPath(this.host + "/routeFind?" + this.createPointParams(false) + "&type=level0l");
 };
 
 GHRequest.prototype.createGPXURL = function (withRoute, withTrack, withWayPoints) {
-    return this.createPath(this.host + "/route?" + this.createPointParams(false) + "&type=gpx&gpx.route=" + withRoute + "&gpx.track=" + withTrack + "&gpx.waypoints=" + withWayPoints);
+    return this.createPath(this.host + "/osmRouteRelation?" + this.createPointParams(false) + "&type=gpx&gpx.route=" + withRoute + "&gpx.track=" + withTrack + "&gpx.waypoints=" + withWayPoints);
+};
+
+GHRequest.prototype.createOsmRouteFixURL = function (routeId) {
+    return this.createPath(this.host + "/routeFix?routeId=" + routeId + "&type=level0l");
 };
 
 GHRequest.prototype.createHistoryURL = function () {
