@@ -22,8 +22,13 @@ public class BusFlagEncoder extends CarFlagEncoder
         this.restrictions.clear();
         this.restrictions.addAll(Arrays.asList("bus", "psv", "motor_vehicle", "vehicle", "access"));
 
+        intendedValues.add("designated");
         absoluteBarriers.remove("bus_trap");
         absoluteBarriers.remove("sump_buster");
+    }
+
+    protected boolean isOneway(ReaderWay way) {
+        return !(way.hasTag("oneway:bus", "no") || way.hasTag("oneway:psv", "no")) && super.isOneway(way);
     }
 
     @Override
