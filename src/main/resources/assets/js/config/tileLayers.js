@@ -20,10 +20,6 @@ var lyrk = L.tileLayer('https://tiles.lyrk.org/' + (retinaTiles ? 'lr' : 'ls') +
     attribution: osmAttr + ', <a href="https://geodienste.lyrk.de/">Lyrk</a>'
 });
 
-var omniscale = L.tileLayer('https://maps.omniscale.net/v2/' +osAPIKey + '/style.default/{z}/{x}/{y}.png' + (retinaTiles ? '?hq=true' : ''), {
-    layers: 'osm',
-    attribution: osmAttr + ', &copy; <a href="https://maps.omniscale.com/">Omniscale</a>'
-});
 
 // Not an option as too fast over limit.
 // var mapbox= L.tileLayer('https://{s}.tiles.mapbox.com/v4/peterk.map-vkt0kusv/{z}/{x}/{y}' + (retinaTiles ? '@2x' : '') + '.png?access_token=pk.eyJ1IjoicGV0ZXJrIiwiYSI6IkdFc2FJd2MifQ.YUd7dS_gOpT3xrQnB8_K-w', {
@@ -68,6 +64,12 @@ var osmde = L.tileLayer('http://{s}.tile.openstreetmap.de/tiles/osmde/{z}/{x}/{y
     attribution: osmAttr
 });
 
+var cyclosm = L.tileLayer('https://dev.{s}.tile.openstreetmap.fr/cyclosm/{z}/{x}/{y}.png', {
+    attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, Rendering: <a href="https://www.cyclosm.org/">CyclOSM</a> ',
+    minZoom: 0,
+    maxZoom: 20,
+});
+
 var mapLink = '<a href="http://www.esri.com/">Esri</a>';
 var wholink = 'i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community';
 var esriAerial = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
@@ -76,17 +78,17 @@ var esriAerial = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/servic
 });
 
 var availableTileLayers = {
-    "Omniscale": omniscale,
     "OpenStreetMap": osm,
+    "CyclOSM": cyclosm,
     "Esri Aerial": esriAerial,
-    "TF Transport": thunderTransport,
-    "TF Cycle": thunderCycle,
-    "TF Outdoors": thunderOutdoors,
-    "TF Neighbourhood": thunderNeighbourhood,
-    "Kurviger Liberty": kurvigerLiberty,
-    "Lyrk": lyrk,
+//    "TF Transport": thunderTransport,
+//    "TF Cycle": thunderCycle,
+//    "TF Outdoors": thunderOutdoors,
+//    "TF Neighbourhood": thunderNeighbourhood,
+//    "Kurviger Liberty": kurvigerLiberty,
+//    "Lyrk": lyrk,
     "WanderReitKarte": wrk,
-    "Sorbian Language": sorbianLang,
+//    "Sorbian Language": sorbianLang,
     "OpenStreetMap.de": osmde
 };
 
@@ -157,8 +159,8 @@ if(ghenv.environment === 'development') {
     overlays = { "Local MVT": vtLayer };
 }
 
-module.exports.activeLayerName = "Omniscale";
-module.exports.defaultLayer = omniscale;
+module.exports.activeLayerName = "OpenStreetMap";
+module.exports.defaultLayer = osm;
 
 module.exports.getAvailableTileLayers = function () {
     return availableTileLayers;
