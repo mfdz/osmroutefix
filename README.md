@@ -28,12 +28,23 @@ We think this tool could be helpful for the OSM community to detect and correct 
 This project is still a prototype. Many features are missing: the BusFlagEncoder only covers a few special cases for bus routing, the BusRouteStrategy could snap bus_stops to the closest highway way, usability of the UI is poor, additional route types could be added... If you deem this tool helpful and want to support it, we'd be glad to receive your pull requests :-) 
 
 ### Docker
-
+#### Development
 Run a dockerized OSMRouteFix from sources:
 
 ```bash
 docker build -t osmroutefix:master .
 docker run -d --name osmroutefix -v <path_data_directory>/data:/data -p 8989:8989 osmroutefix:master
+```
+
+#### Production
+Create a dockerized OSMRouteFix containing just pre-built jar (~25MB on top of standard openjdk-image):
+
+Note: The pbf files must already be downloaded to the data directory. The data is not downloades by the container.
+
+```bash
+npm run bundleProduction
+mnv install docker:build
+docker run -d --name osmroutefix -v <path_data_directory>/data:/osmroutefix/data -p 8989:8989 osmroutefix:latest
 ```
 
 See also the builds at [Docker Hub](https://hub.docker.com/r/mfdz/osmroutefix)

@@ -4,7 +4,7 @@
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>de.mfdz</groupId>
-    <artifactId>osmrf</artifactId>
+    <artifactId>osmroutefix</artifactId>
     <packaging>jar</packaging>
     <name>OSM Route Fix</name>
     <version>0.1-SNAPSHOT</version>
@@ -20,6 +20,7 @@
         <jackson.version>2.9.9</jackson.version>
         <guava.version>24.1.1-jre</guava.version>
         <slf4j.version>1.7.26</slf4j.version>
+        <docker.project.version>${project.version}</docker.project.version>
     </properties>
 
     <dependencies>
@@ -152,7 +153,27 @@
                     </execution>
                 </executions>
             </plugin>
-
+            <plugin>
+                <groupId>io.fabric8</groupId>
+                <artifactId>docker-maven-plugin</artifactId>
+                <version>0.31.0</version>
+                <configuration>
+                    <images>
+                        <image>
+                            <!-- %l means latest if project.version ends on -SNAPSHOT, else project version -->
+                            <name>mfdz/osmroutefix:%l</name>
+                            <build>
+                                <!-- Filter to have @docker.project.version@ replaced -->
+                                <filter>@</filter>
+                                <dockerFileDir>${project.basedir}/src/main/docker</dockerFileDir>
+                                <assembly>
+                                    <descriptor>docker-assembly.xml</descriptor>
+                                </assembly>
+                            </build>
+                        </image>
+                    </images>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 

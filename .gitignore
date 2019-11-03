@@ -5,7 +5,7 @@ TODO.txt
 *.osm
 nbactions*.xml
 config.properties
-config.yml
+/config.yml
 build.xml
 queries.sh
 maven/
