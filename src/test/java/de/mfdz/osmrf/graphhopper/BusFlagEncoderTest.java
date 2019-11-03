@@ -39,5 +39,23 @@ public class BusFlagEncoderTest {
         assertTrue(accessEnc.getBool(true, flags));
         way.clearTags();
     }
+
+    @Test
+    public void testGetAccess_HighwayPedestrian() {
+        // e.g. w75077805
+        ReaderWay way = new ReaderWay(1);
+        way.setTag("highway", "pedestrian");
+        way.setTag("psv", "yes");
+        EncodingManager.Access access = encoder.getAccess(way);
+        assertTrue("highway=predestrian with psv=yes should be accessible",access.isWay());
+        way.clearTags();
+
+        // without psv, pedestrian should not be accessible
+        way.setTag("highway", "pedestrian");
+        access = encoder.getAccess(way);
+        assertFalse("highway=predestrian without psv=yes should not be accessible", access.isWay());
+        way.clearTags();
+
+    }
 }
 
