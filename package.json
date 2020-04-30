@@ -28,7 +28,7 @@
     "browserify": "16.2.0",
     "browserify-swap": "0.2.2",
     "d3": "5.11.0",
-    "jquery": "3.4.1",
+    "jquery": "3.5.0",
     "leaflet": "1.5.1",
     "leaflet-contextmenu": "1.4.0",
     "leaflet-loading": "0.1.24",
