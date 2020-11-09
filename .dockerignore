@@ -2,3 +2,5 @@
 *.osm.pbf
 target/
 *.osm-gh/
+node_modules/
+logs/
