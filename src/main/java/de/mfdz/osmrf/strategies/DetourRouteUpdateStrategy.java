@@ -89,6 +89,8 @@ public class DetourRouteUpdateStrategy extends AbstractRouteUpdateStrategy {
     public GHRequest getRouteRequest(List<GHPoint> routePoints) {
         GHRequest request =  new GHRequest(routePoints).
                 setWeighting("fastest").setVehicle("car");
+        request.getSnapPreventions().add("link");
+        request.getHints().put("pass_through", Boolean.TRUE);
         return request;
     }
 

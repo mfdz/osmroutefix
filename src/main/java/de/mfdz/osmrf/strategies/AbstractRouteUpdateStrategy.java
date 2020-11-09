@@ -30,7 +30,8 @@ public abstract class AbstractRouteUpdateStrategy implements RouteUpdateStrategy
         Iterator<RelationMember> iterator = relation.getMembers().iterator();
         while (iterator.hasNext()) {
             RelationMember member = iterator.next();
-            if (member.getType() == Element.Type.WAY && getWayRoles().contains(member.getRole())) {
+            if (member.getType() == Element.Type.WAY && (member.getRole() == null ||
+                    getWayRoles().contains(member.getRole().toLowerCase()))) {
                 iterator.remove();
             }
         }
@@ -39,15 +40,16 @@ public abstract class AbstractRouteUpdateStrategy implements RouteUpdateStrategy
     @Override
     public void updateWayMembersIfNecessary(CachedRelationWrapper relation,
             List<RelationMember> wayMembers) {
-        boolean equal = areWayMembersEqual(relation, wayMembers);
+        ComparisonResult equal = areWayMembersEqual(relation, wayMembers);
 
-        if (!equal) {
+        if (!equal.getPathsAreEqual()) {
             removeWayMembers(relation);
             relation.getMembers().addAll(wayMembers);
         }
     }
 
-    private boolean areWayMembersEqual(CachedRelationWrapper relation,
+    @Override
+    public ComparisonResult areWayMembersEqual(CachedRelationWrapper relation,
             List<RelationMember> wayMembers) {
         Iterator<RelationMember> iterator = relation.getMembers().iterator();
         int wayIndex = 0;

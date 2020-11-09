@@ -6,6 +6,7 @@ import com.graphhopper.util.shapes.GHPoint;
 import de.mfdz.osmrf.osmapi.CachedRelationWrapper;
 import de.mfdz.osmrf.role.EmptyRole;
 import de.mfdz.osmrf.role.RoleStrategy;
+import de.westnordost.osmapi.map.data.Element;
 import de.westnordost.osmapi.map.data.OsmRelationMember;
 import de.westnordost.osmapi.map.data.RelationMember;
 
@@ -35,12 +36,30 @@ public class BusRouteUpdateStrategy extends AbstractRouteUpdateStrategy {
     public List<GHPoint> getRoutePoints(CachedRelationWrapper rel) {
         List<GHPoint> routePoints = new ArrayList<>();
         int count = 0;
+        RelationMember mostRecentStop = null;
         for (RelationMember member : rel.getMembers()) {
+            // FIXME quick hack to try curbside
+
             if ("stop".equals(member.getRole())) {
+                mostRecentStop = member;
+            } else if ("platform".equals(member.getRole())) {
                 count++;
-                GHPoint point = asGHPoint(rel.getMemberElement(member));
-                routePoints.add(point);
-              }
+                GHPoint point;
+                if (member.getType() == Element.Type.WAY) {
+                    if (mostRecentStop != null) {
+                        point = asGHPoint(rel.getMemberElement(mostRecentStop));
+                        mostRecentStop = null;
+                        routePoints.add(point);
+                    }
+                } else {
+                    point = asGHPoint(rel.getMemberElement(member));
+                    routePoints.add(point);
+                    mostRecentStop = null;
+                }
+
+                if (count>3)
+                    return routePoints;
+            }
         }
 
         //routePoints.add(new GHPoint(48.69203, 9.12266));
@@ -78,8 +97,9 @@ public class BusRouteUpdateStrategy extends AbstractRouteUpdateStrategy {
         GHRequest request =  new GHRequest(routePoints).
                 setWeighting("fastest").setVehicle("bus");
         request.getHints().put("edge_based", Boolean.TRUE).put("u_turn_costs", -1)
-                .put("pass_through", Boolean.TRUE)
-        ;
+                .put("pass_through", Boolean.TRUE);
+
+        request.setCurbsides(Collections.nCopies(routePoints.size(), "right"));
         return request;
     }
 

@@ -143,13 +143,51 @@ public class RouteCalculator {
     }
 
     public RelationWrapper newRoute(String routeType, List<GHPoint> routePoints) {
-        GHRequest request = newRouteRequest(routeType, routePoints);
         RouteUpdateStrategy strategy = getRouteUpdateStrategy(routeType);
-        List<Path> paths = getPaths(request);
         List<RelationMember> members = getNodeMembers(routePoints, strategy);
-        members.addAll(getWayMembers(paths, strategy.getRoleStrategy()));
+
+        List<RelationMember> wayMembers = computeWayMembers(routeType, routePoints);
+        members.addAll(wayMembers);
         return new RelationWrapper(new OsmRelation(-1, 0, members, strategy.getTagTemplate()));
     }
 
+    private List<RelationMember> computeWayMembers(String routeType, List<GHPoint> routePoints) {
+        RouteUpdateStrategy strategy = getRouteUpdateStrategy(routeType);
+        GHRequest request = newRouteRequest(routeType, routePoints);
+        List<Path> paths = getPaths(request);
+        List<RelationMember> wayMembers = getWayMembers(paths, strategy.getRoleStrategy());
+        return filterStartEndWayByRoutePoints(wayMembers, routePoints.get(0), routePoints.get(routePoints.size()-1));
+    }
 
+    private List<RelationMember> filterStartEndWayByRoutePoints(List<RelationMember> wayMembers, GHPoint startPoint, GHPoint endPoint) {
+        int waysSize = wayMembers.size();
+        int startSeq = distance(wayMembers.get(0), startPoint) >= distance(wayMembers.get(1), startPoint)? 1 : 0;
+        int endSeq = distance(wayMembers.get(waysSize-1), endPoint) >= distance(wayMembers.get(waysSize-2), endPoint)? waysSize - 1 : waysSize;
+        return wayMembers.subList(startSeq, endSeq);
+    }
+
+    private double distance(RelationMember relationMember, GHPoint coords) {
+        MapDataDao mapDao = new MapDataDao(osm);
+        CachingMapDataHandler handler = new CachingMapDataHandler();
+        mapDao.getWayComplete(relationMember.getRef(), handler);
+        Way nodeIds = handler.getWay(relationMember.getRef());
+        nodeIds.getNodeIds();
+        Node startNode = handler.getNode(nodeIds.getNodeIds().get(0));
+        Node endNode = handler.getNode(nodeIds.getNodeIds().get(nodeIds.getNodeIds().size()-1));
+
+        return Math.min(distance(coords.lat, coords.lon, startNode.getPosition().getLatitude(), startNode.getPosition().getLongitude()),
+                distance(coords.lat, coords.lon, endNode.getPosition().getLatitude(), endNode.getPosition().getLongitude()));
+    }
+
+    private double distance(double lat1, double lon1, double lat2, double lon2) {
+        double earthRadius = 6371000; //meters
+        double dLat = Math.toRadians(lat2 - lat1);
+        double dLng = Math.toRadians(lon2 - lon1);
+        double a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(Math.toRadians(lat1)) * Math
+                .cos(Math.toRadians(lat2)) * Math.sin(dLng / 2) * Math.sin(dLng / 2);
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        float dist = (float) (earthRadius * c);
+
+        return dist;
+    }
 }

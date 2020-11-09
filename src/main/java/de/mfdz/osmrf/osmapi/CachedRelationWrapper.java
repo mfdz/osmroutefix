@@ -4,6 +4,9 @@ import de.westnordost.osmapi.map.data.Element;
 import de.westnordost.osmapi.map.data.Relation;
 import de.westnordost.osmapi.map.data.RelationMember;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 public class CachedRelationWrapper extends RelationWrapper {
     private CachingMapDataHandler handler;
 
@@ -20,5 +23,10 @@ public class CachedRelationWrapper extends RelationWrapper {
         } else {
             return handler.getRelation(member.getRef());
         }
+    }
+
+    public List<Element> getMemberElementsOfType(Element.Type type) {
+        return getMembersOfType(type).stream().sequential().map(member -> getMemberElement(member))
+                .collect(Collectors.toList());
     }
 }
