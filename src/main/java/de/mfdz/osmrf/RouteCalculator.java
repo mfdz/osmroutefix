@@ -14,6 +14,7 @@ import de.mfdz.osmrf.osmapi.CachedRelationWrapper;
 import de.mfdz.osmrf.osmapi.CachingMapDataHandler;
 import de.mfdz.osmrf.osmapi.RelationWrapper;
 import de.mfdz.osmrf.role.RoleStrategy;
+import de.mfdz.osmrf.strategies.BicycleRouteUpdateStrategy;
 import de.mfdz.osmrf.strategies.BusRouteUpdateStrategy;
 import de.mfdz.osmrf.strategies.DetourRouteUpdateStrategy;
 import de.mfdz.osmrf.strategies.RouteUpdateStrategy;
@@ -31,7 +32,7 @@ public class RouteCalculator {
 
     private final RouteFixHopper gh;
 
-    private RouteUpdateStrategy[] updateStrategies = { new DetourRouteUpdateStrategy(), new BusRouteUpdateStrategy() };
+    private RouteUpdateStrategy[] updateStrategies = { new DetourRouteUpdateStrategy(), new BusRouteUpdateStrategy(), new BicycleRouteUpdateStrategy() };
 
     public RouteCalculator( OsmConnection osm, RouteFixHopper gh) {
         this.osm = osm;
