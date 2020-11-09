@@ -2,9 +2,11 @@ package de.mfdz.osmrf.strategies;
 
 import com.graphhopper.util.shapes.GHPoint;
 import de.mfdz.osmrf.osmapi.CachedRelationWrapper;
+import de.mfdz.osmrf.validation.ComparisonResult;
+import de.mfdz.osmrf.validation.ConnectivityValidator;
+import de.westnordost.osmapi.map.MapDataDao;
 import de.westnordost.osmapi.map.data.Element;
 import de.westnordost.osmapi.map.data.Node;
-import de.westnordost.osmapi.map.data.OsmRelationMember;
 import de.westnordost.osmapi.map.data.RelationMember;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,13 +16,13 @@ import java.util.List;
 
 public abstract class AbstractRouteUpdateStrategy implements RouteUpdateStrategy {
 
-    final Logger logger = LoggerFactory.getLogger(AbstractRouteUpdateStrategy.class);
+    final static Logger logger = LoggerFactory.getLogger(AbstractRouteUpdateStrategy.class);
 
 
     GHPoint asGHPoint(Element node) {
         if (node.getType() != Element.Type.NODE) {
             throw new IllegalArgumentException(
-                    "Unexpected element type " + node.getType() + "for " + node.getId()
+                    "Unexpected element type " + node.getType() + " for " + node.getId()
                             + ". Should be NODE.");
         }
         return new GHPoint(((Node) node).getPosition().getLatitude(), ((Node) node).getPosition().getLongitude());
@@ -64,27 +66,26 @@ public abstract class AbstractRouteUpdateStrategy implements RouteUpdateStrategy
             wayEncountered = true;
             // Now we encounter first way, we compare if all members are equal to wayMembers
             if (wayMembers.size() < wayIndex + 1) {
-                equal = false;
-                logger.debug("Relation {} differs at member index {}. {}{} (role: {}) is unmatched.",
+                return new ComparisonResult(false, String.format(
+                        "Relation %d differs at member index %d. %s%d (role: %s) is unmatched.",
                         relation.getId(),
                         wayIndex,
                         member.getType(),
                         member.getRef(),
-                        member.getRole());
-                break;
+                        member.getRole()));
             }  else if (!wayMembers.get(wayIndex).equals(member)) {
-                equal = false;
-                logger.debug("Relation {} differs at member index {}. Existing has w{} (role: {}), updated w{} (role: {})",
-                        relation.getId(),
-                        wayIndex,
-                        member.getRef(),
-                        member.getRole(),
-                        wayMembers.get(wayIndex).getRef(),
-                        wayMembers.get(wayIndex).getRole()
-                        );
+                return new ComparisonResult(false, String.format(
+                        "Relation %d differs at member index %d. w%d (role: %s) is unmatched, updated w%d (role: %s).",
+                        relation.getId(), wayIndex, member.getRef(), member.getRole(),
+                        wayMembers.get(wayIndex).getRef(), wayMembers.get(wayIndex).getRole()));
             }
             wayIndex++;
         }
-        return equal;
+        return ComparisonResult.NO_DIFF;
+    }
+
+    @Override
+    public ComparisonResult validate(CachedRelationWrapper rel, MapDataDao dao) {
+        return ConnectivityValidator.validateConnectivity(rel);
     }
 }

@@ -17,6 +17,7 @@ import de.mfdz.osmrf.role.RoleStrategy;
 import de.mfdz.osmrf.strategies.BusRouteUpdateStrategy;
 import de.mfdz.osmrf.strategies.DetourRouteUpdateStrategy;
 import de.mfdz.osmrf.strategies.RouteUpdateStrategy;
+import de.mfdz.osmrf.validation.ComparisonResult;
 import de.westnordost.osmapi.OsmConnection;
 import de.westnordost.osmapi.map.MapDataDao;
 import de.westnordost.osmapi.map.data.*;
@@ -125,6 +126,22 @@ public class RouteCalculator {
         return new CachedRelationWrapper(r, handler);
     }
 
+    public List<GHPoint> getRoutingPoints(List<Long> nodeIds) {
+        MapDataDao mapDao = new MapDataDao(osm);
+        List<Node> nodes = mapDao.getNodes(nodeIds);
+        List<GHPoint> points = new ArrayList<>();
+        for (int i = 0; i < nodeIds.size(); i++) {
+            for (int j = 0; j < nodes.size(); j++) {
+                Node node = nodes.get(j);
+                if (node.getId() == nodeIds.get(i)) {
+                    points.add(new GHPoint(node.getPosition().getLatitude(), node.getPosition().getLongitude()));
+                    break;
+                }
+            }
+        }
+        return points;
+    }
+
     private List<Path> getPaths(GHRequest request) {
         GHResponse rsp = new GHResponse();
         List<Path> paths = gh.calcPaths(request, rsp);
@@ -189,5 +206,32 @@ public class RouteCalculator {
         float dist = (float) (earthRadius * c);
 
         return dist;
+    }
+
+    public ComparisonResult compareRoutes(long relId, List<Long> nodeIds) {
+        ComparisonResult comparison = validateRoutes(relId);
+        if (nodeIds.size() >= 2) {
+            try {
+                List<GHPoint> routePoints = getRoutingPoints(nodeIds);
+                CachedRelationWrapper actualRoute = getRouteRelation(relId);
+                String routeType = actualRoute.getTag("route");
+                List<RelationMember> expectedRoute = computeWayMembers(routeType, routePoints);
+                RouteUpdateStrategy strategy = getRouteUpdateStrategy(routeType);
+                comparison.addIssuesFrom(strategy.areWayMembersEqual(actualRoute, expectedRoute));
+            } catch (PointOutOfBoundsException e) {
+                comparison.addIssue("comparisonFailed", e.getMessage());
+            }
+        } else {
+            comparison.addIssue("noNodesDefined", "To compare existing to recalculated route, at least 2 nodes must be supplied");
+        }
+        return comparison;
+    }
+
+    public ComparisonResult validateRoutes(long relId) {
+        CachedRelationWrapper
+                actualRoute = getRouteRelation(relId);
+        String routeType = actualRoute.getTag("route");
+        RouteUpdateStrategy strategy = getRouteUpdateStrategy(routeType);
+        return strategy.validate(actualRoute, new MapDataDao(osm));
     }
 }

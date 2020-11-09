@@ -211,6 +211,7 @@ public class RouteFixBundle implements ConfiguredBundle<GraphHopperBundleConfigu
         environment.jersey().register(SPTResource.class);
         environment.jersey().register(I18NResource.class);
         environment.jersey().register(InfoResource.class);
+        environment.jersey().register(RouteCompareResource.class);
         environment.jersey().register(RouteFixResource.class);
         environment.jersey().register(RouteFindResource.class);
         environment.jersey().register(RouteForOsmRouteResource.class);
