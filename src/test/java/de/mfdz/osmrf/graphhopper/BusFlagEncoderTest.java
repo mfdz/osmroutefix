@@ -13,7 +13,7 @@ import static org.junit.Assert.*;
 
 public class BusFlagEncoderTest {
     private final EncodingManager em = EncodingManager.create(Arrays.asList(
-            new BusFlagEncoder(new PMap("speed_two_directions=true"))), 8);
+            new BusFlagEncoder(new PMap("speed_two_directions=true"))));
     private final BusFlagEncoder encoder = (BusFlagEncoder) em.getEncoder("bus");
     private final BooleanEncodedValue accessEnc = encoder.getAccessEnc();
 

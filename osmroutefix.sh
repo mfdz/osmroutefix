@@ -235,7 +235,7 @@ else
 fi
 
 : "${JAVA_OPTS:=-Xmx1000m -Xms1000m}"
-: "${JAR:=target/osmrf-$VERSION.jar}"
+: "${JAR:=target/osmroutefix-$VERSION.jar}"
 : "${GRAPH:=$DATADIR/$NAME-gh}"
 
 ensureOsm
